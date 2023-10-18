@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "cmath": "cpp",
+        "iostream": "cpp",
+        "vector": "cpp",
+        "unordered_map": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.default.enableConfigurationSquiggles": true,
+    "C_Cpp.files.exclude": {
+
+        "**/.vscode": true,
+        "**/.vs": true
+    }
+}
