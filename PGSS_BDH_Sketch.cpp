@@ -22,7 +22,7 @@ int PGSS_BDH_Sketch::useHash(int n){
 void PGSS_BDH_Sketch::update(int s, int d, int w, int t){
     int x = useHash(s);
     int y = useHash(d);
-    int end = ceil(log2(t));
+    int end = ceil(log2(T));
     for(int l = 0; l < end ; l++){
         int g = pow(2,l);
         int c = ceil(t/g);

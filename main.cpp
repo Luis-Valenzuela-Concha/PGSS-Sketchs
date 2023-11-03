@@ -27,11 +27,11 @@ vector<pair<int,int>> GetPerfectCover(int ts, int te){
 
 int main(){
     int ts,te;
-    /*cin >> ts; cin >> te;
+    cin >> ts; cin >> te;
     vector<pair<int,int>> I = GetPerfectCover(ts,te);
     for(int i=0;i<I.size();i++){
         printf("[%d,%d]\n",I[i].first,I[i].second);
-    }*/
+    }
     PGSS_BDH_Sketch sketch (3,16,3);
     sketch.update(1,2,4,4);
     sketch.update(1,2,10,10);
