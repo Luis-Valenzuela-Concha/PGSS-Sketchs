@@ -3,7 +3,8 @@
         "cmath": "cpp",
         "iostream": "cpp",
         "vector": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "ostream": "cpp"
     },
     "C_Cpp.errorSquiggles": "enabled",
     "C_Cpp.default.enableConfigurationSquiggles": true,
