@@ -13,6 +13,9 @@ class PGSS_BDH{
         int T; //Marca de tiempo maxima
         int k; //Funciones hash
         vector<vector<vector<int>>> insertados;
+        vector<vector<vector<int>>> promedio;
+        vector<vector<vector<int>>> desviacionAcumulada;
+        vector<vector<vector<int>>> desviacion;
     public:
         PGSS_BDH(int m, int T, int k);
         ~PGSS_BDH();

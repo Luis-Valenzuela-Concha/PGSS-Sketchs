@@ -21,6 +21,15 @@ PGSS_BDH::PGSS_BDH(int m, int T, int k){ //m = tamaño matriz, T = marca de tiem
     insertados = vector<vector<vector<int>>> 
                  (k, vector<vector<int>> 
                  (m, vector<int>(m,0)));
+    promedio = vector<vector<vector<int>>> 
+                 (k, vector<vector<int>> 
+                 (m, vector<int>(m,0)));
+    desviacionAcumulada = vector<vector<vector<int>>> 
+                 (k, vector<vector<int>> 
+                 (m, vector<int>(m,0)));
+    desviacion = vector<vector<vector<int>>> 
+                 (k, vector<vector<int>> 
+                 (m, vector<int>(m,0)));
 }
 
 PGSS_BDH::~PGSS_BDH(){;}
@@ -51,7 +60,9 @@ int PGSS_BDH::useHash(int n, int hash){
 }
 
 void PGSS_BDH::update(int s, int d, int w, int t){
+    bool anomalia = true;
     int end = ceil(log2(T));
+    //cout << t <<") "<<"Hashes:" << endl;
     for(int hash = 0; hash < k ; hash++){
         int x = useHash(s,hash); // source
         int y = useHash(d,hash); // destination 
@@ -66,7 +77,26 @@ void PGSS_BDH::update(int s, int d, int w, int t){
             }
         }
         insertados[hash][x][y]++;
+        /*promedio[hash][x][y] = sketch[hash][x][y][ceil(log2(T))].at(1) / insertados[hash][x][y];
+        desviacionAcumulada[hash][x][y] += pow(w - promedio[hash][x][y],2);
+        desviacion[hash][x][y] = sqrt(desviacionAcumulada[hash][x][y] / insertados[hash][x][y]);*/
+        //cout << hash << " promedio: " << promedio[hash][x][y] << " desviacion: " << desviacion[hash][x][y] << endl;
+
+
     }
+    /*for(int hash = 0; hash < k ; hash++){
+        int x = useHash(s,hash); // source
+        int y = useHash(d,hash); // destination 
+        int inf = promedio[hash][x][y] - 1.5*float(desviacion[hash][x][y]);
+        int sup = promedio[hash][x][y] + 1.5*float(desviacion[hash][x][y]);
+        if(inf <= w && w <= sup){
+            anomalia = false;
+        }
+        
+    }
+    if(anomalia){
+        cout << t <<") "<<"Anomalia: " << s << " " << d << " " << w << endl;
+    }*/
 }
 
 vector<pair<int,int>> GetPerfectCover(int ts, int te){
@@ -136,7 +166,7 @@ vector<pair<int,int>> PGSS_BDH:: find_anomalia(int s, int d, int ts, int te, flo
     int hash = 0;
     int x = useHash(s,hash); int y = useHash(d,hash);
     int promedio = sketch[hash][x][y][ceil(log2(T))].at(1) / insertados[hash][x][y];
-    cout << "Promedio: " << promedio << endl;
+    //cout << "Promedio: " << promedio << endl;
     //Calcula la anomalia
     for(int i = 0; i < I.size(); i++){
         int w = query(s,d,I[i].first,I[i].second);

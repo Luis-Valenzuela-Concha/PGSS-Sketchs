@@ -42,45 +42,52 @@ vector<vector<string>> copiarArchivo(string nombreArchivo, int n){
 int main(){
 
     // Copia de archivo
-    int n = 131072;
+    int n = 32768;
+    //int n = 128;
+    //int n = 32;
     vector<vector<string>> file = copiarArchivo("datasets/chicago2015_withdata.txt",n);
-    cout << "Insertados:" << endl;
+
+    /* Rango de tiempo de aristas insertadas */
+    cout << "Rango de insertados:" << endl;
     cout << "[" << file[0][0] << " " << file[0][1] << " " << file[0][2] << " " << file[0][3] << " , ";
     cout << file[n-1][0] << " " << file[n-1][1] << " " << file[n-1][2] << " " << file[n-1][3] << "]" << endl;
-    /*
-    file[i][0] = fecha; file[i][1] = hora; file[i][2] = segundos; file[i][3] = nanosegundos; 
-    file[i][4] = IP1; file[i][5] = IP2;
-    file[i][6] = peso;
-    */
-    /*for(vector<string> linea : file){
-        cout << linea[0] << " " << linea[1] << " " << linea[2] << " " << linea[3] << " " <<
-        linea[4] << " " << linea[5] << " " << linea[6] << endl;
-    }*/
-    
-    /*vector<unsigned int> ips;
-    for(vector<string> linea : file){
-        ips.push_back(stoi(linea[4]));
-        ips.push_back(stoi(linea[5]));
-    }
-    sort(ips.begin(),ips.end());
-    ips.erase(unique(ips.begin(),ips.end()),ips.end());
-    cout << ips.size() << endl;*/
 
-    int m = 800; int T = n; int k = 3;
+    /* Inicializar sketch */
+    int m = 1000; int T = n; int k = 3;
     PGSS_BDH sketch (m,T,k);
+
+    /* Insertar aristas */
     int i = 1;
+    int inicio = i;
+    int final;
     for(vector<string> linea : file){
         sketch.update(stoi(linea[4]),stoi(linea[5]),stoi(linea[6]),i);
         i++;
+        if(i%100 == 0 || i == n){
+            final = i;
+            /*for(int j = inicio-1; j < final; j++){
+                vector<string> linea = file[j];
+                int s = stoi(linea[4]); 
+                int d = stoi(linea[5]); 
+                int ts = inicio; 
+                int te = final;
+                cout << "Intervalo: [" << ts << "," << te << "]" << endl;
+                vector<pair<int,int>> anomalias = sketch.find_anomalia(s,d,ts,te, 1,300);
+            }*/
+            cout << "Intervalo: [" << inicio << "," << final << "]" << endl;
+            inicio = final+1;
+        }
     }
-    vector<string> linea = file[0];
+    /*vector<string> linea = file[0];
     int s = stoi(linea[4]); int d = stoi(linea[5]); int ts = 1; int te = n;
-    cout << s << " " << d << " " << stoi(linea[6]) << endl;
+    cout << s << " " << d << " " << stoi(linea[6]) << endl;*/
 
-    float precision = 1; int umbral = 300;
-    vector<pair<int,int>> anomalias = sketch.find_anomalia(s,d,ts,te, precision,umbral);
+    /* Obtener anomalias */
+    /*float precision = 1; int umbral = 300;
+    vector<pair<int,int>> anomalias = sketch.find_anomalia(s,d,ts,te, precision,umbral);*/
     
-    cout << "Anomalias: " << anomalias.size() << endl;
+    /* Imprimir anomalias */
+    /*cout << "Anomalias: " << anomalias.size() << endl;
     for(pair<int,int> intervalo : anomalias){
         cout << "[" << intervalo.first << "," << intervalo.second << "]" << endl;
         cout << "[" << file[intervalo.first-1][0] <<" "<<file[intervalo.first-1][1] << " " << 
@@ -88,7 +95,7 @@ int main(){
 
         cout << file[intervalo.second-1][0] <<" "<<file[intervalo.second-1][1] << " " << 
         file[intervalo.second-1][2] << " " << file[intervalo.second-1][3] << "]" << endl;;
-    }
+    }*/
 
     return 0;
 }
