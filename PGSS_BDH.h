@@ -20,7 +20,7 @@ class PGSS_BDH{
         void update(int s, int d, int w, int t);
         int useHash(int n, int hash);
         void print(int x, int y, int hash);
-        vector<pair<int,int>> find_anomalia(int s, int d, int ts, int te, float precision, int umbral);
+        vector<pair<int,int>> find_anomalia(int s, int d, int ts, int te, float precision);
 };
 
 #endif

@@ -112,41 +112,36 @@ int PGSS_BDH::query(int s, int d, int ts, int te){
     return W;
 }
 
-vector<pair<int,int>> PGSS_BDH:: find_anomalia(int s, int d, int ts, int te, float precision, int umbral){
+vector<pair<int,int>> PGSS_BDH:: find_anomalia(int s, int d, int ts, int te, float precision){
     vector<pair<int,int>> anomalias;
     int rango_total = te-ts+1;
-    int particiones = rango_total*precision;
-    if(rango_total < particiones) particiones = rango_total;
-    int rango_intervalo = rango_total/particiones;
 
     //Crea subintervalos
     vector<pair<int,int>> I;
-    for(int i = 0; i < particiones ; i++){
-        int ts1 = ts + rango_intervalo * i;
-        int te1 = ts + rango_intervalo * (i+1) - 1;
-        I.push_back(pair<int,int>(ts1,te1));
-    }
-    //Ajusta el ultimo intervalo
-    if(I[I.size()-1].second < te){
-        I.push_back(pair<int,int>(I[I.size()-1].second+1,te));
-        particiones++;
+    for(int i = 0; i < rango_total ; i++){
+        I.push_back(pair<int,int>(ts+i,ts+i));
     }
 
     //Calcula el flujo promedio
     int hash = 0;
     int x = useHash(s,hash); int y = useHash(d,hash);
-    int promedio = sketch[hash][x][y][ceil(log2(T))].at(1) / insertados[hash][x][y];
-    cout << "Promedio: " << promedio << endl;
+    int promedio = INT_MAX;
+    for(int i = 0 ; i < k ; i++){
+        promedio = min(promedio,sketch[hash][x][y][ceil(log2(T))].at(1) / insertados[hash][x][y]);
+    }
+    
+    int desviacion_estandar = 0;
+    for(int i = 0; i < I.size(); i++){
+        int w = query(s,d,I[i].first,I[i].second);
+        if(w == 0) continue;
+        desviacion_estandar += pow(w - promedio,2);
+    }
+    desviacion_estandar = sqrt(desviacion_estandar / insertados[hash][x][y]);
     //Calcula la anomalia
     for(int i = 0; i < I.size(); i++){
         int w = query(s,d,I[i].first,I[i].second);
         if(w == 0) continue;
-        int promedio_intervalo = promedio * (I[i].second - I[i].first + 1);
-        /*cout << "Intervalo: [" << I[i].first << "," << I[i].second << "]" << endl;
-        cout << "Promedio intervalo: " << promedio_intervalo << endl;
-        cout << "w: " << w << endl;*/
-        int diferencia = abs(w - promedio_intervalo);
-        if(diferencia > umbral){
+        if(w < promedio - precision*desviacion_estandar || w > promedio + precision*desviacion_estandar){
             anomalias.push_back(I[i]);
         }
     }
