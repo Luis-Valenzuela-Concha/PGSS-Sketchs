@@ -32,5 +32,6 @@
 *.app
 
 # Specific files
+.vscode
 chicago2015_withdata.txt
 informe

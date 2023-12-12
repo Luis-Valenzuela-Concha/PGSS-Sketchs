@@ -31,18 +31,24 @@ int PGSS_BDH::useHash(int n, int hash){
     uint32_t hash_value;
     switch (hash) {
         case 0:
-            hash_value = MurmurHash64A(&n, sizeof(unsigned int), seed) % size;
+            hash_value = MurmurHash64A(&n, sizeof(unsigned int), 1) % size;
             break;
         case 1:
-            hash_value = CityHash64WithSeed((const char*)&n, sizeof(unsigned int), seed) % size;
+            hash_value = CityHash64WithSeed((const char*)&n, sizeof(unsigned int), 1) % size;
             break;
         case 2:
             uint32_t hash;
-            MurmurHash3_x86_32(&n, sizeof(unsigned int), seed, &hash);
+            MurmurHash3_x86_32(&n, sizeof(unsigned int), 1, &hash);
             hash_value = hash % size;
             break;
         case 3:
-            hash_value = Crap8((const uint8_t*)&n, sizeof(unsigned int), seed) % size;
+            hash_value = Crap8((const uint8_t*)&n, sizeof(unsigned int), 1) % size;
+            break;
+        case 4:
+            hash_value = MurmurHash64A(&n, sizeof(unsigned int), 4) % size;
+            break;
+        case 5:
+            hash_value = MurmurHash64A(&n, sizeof(unsigned int), 5) % size;
             break;
         default:
             break;

@@ -58,7 +58,7 @@ int main(){
 
 
     /* Inicializa sketch */
-    int m = 1000; int T = n; int k = 3;
+    int m = 1000; int T = n; int k = 5;
     PGSS_BDH sketch (m,T,k);
 
     printf("\nSe reduce tamaño de n = %ld a m = %d",IPs.size(),m);

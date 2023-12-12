@@ -2,6 +2,10 @@
 #include <iostream>
 #include <fstream>
 #include "PGSS_BDH.h"
+#include "hashes/City.h"
+#include "hashes/Hashes.h"
+#include "hashes/MurmurHash2.h"
+#include "hashes/MurmurHash3.h"
 #include <chrono>
 
 using namespace std;
@@ -106,31 +110,41 @@ int main(){
         conexiones.push_back(conexion);
     }
 
-    int m = 1000; int T = time; int k = 3;
-    PGSS_BDH sketch (m,T,k);
+    freopen("ERM2.txt","w",stdout);
+    cout << "Calculo de ERM" << endl;
+    cout << "Cantidad de conexiones: " << conexiones.size() << endl << endl;
+    int m = 1000; int T = time;
+    for(int k = 2; k <= 5 ; k++){
+        cout << "k: " << k << endl;
+        PGSS_BDH sketch (m,T,k);
+        int i = 1;
+        for(vector<string> linea : file){
+            sketch.update(stoi(linea[4]),stoi(linea[5]),stoi(linea[6]),i);
+            i++;
+        }
+  
+        double ER;
+        double suma_precision = 0;
+        for (vector<vector<string>> conexion : conexiones){ 
+            double valor_exacto = (double)cantidadAnomalias(conexion);
+            vector<pair<int,int>> anomalias = sketch.find_anomalia(stoi(conexion[0][0]),stoi(conexion[0][1]),1,time,1);
+            double valor_estimado = double(anomalias.size());
+            if(valor_exacto == 0){
+                valor_exacto += 1;
+                valor_estimado += 1;
+            }
+            if(valor_estimado == valor_exacto) {
+                suma_precision++;
+            }
+            double error = abs(valor_exacto - valor_estimado)/valor_exacto;
+            ER += error;
+        }
 
-    cout << "\nInsertando...\n" << endl;
-    int i = 1;
-    for(vector<string> linea : file){
-        sketch.update(stoi(linea[4]),stoi(linea[5]),stoi(linea[6]),i);
-        i++;
+        double ERM = ER/conexiones.size();
+        double precision = suma_precision/conexiones.size();
+        cout << "ERM: " << ERM << endl;
+        cout << "Precision: " << precision << endl << endl;
     }
 
-    freopen("output.txt","w",stdout);
-    float ERM;
-    int valor_exacto = 0;
-    int valor_estimado = 0;
-    cout << "Cantidad de conexiones: " << conexiones.size() << endl;
-    for (vector<vector<string>> conexion : conexiones){ 
-        cout << "Conexion: " << conexion[0][0] << " - " << conexion[0][1] << endl;
-        cout <<"Anomalias reales: "<< cantidadAnomalias(conexion) << endl;
-        valor_exacto += cantidadAnomalias(conexion);
-        vector<pair<int,int>> anomalias = sketch.find_anomalia(stoi(conexion[0][0]),stoi(conexion[0][1]),1,time,1);
-        cout <<"Anomalias detectadas: "<< anomalias.size() << endl;
-        valor_estimado += anomalias.size();
-        cout << endl;
-    }
-    ERM = (float)abs(valor_exacto - valor_estimado)/(float)valor_exacto;
-    cout << "ERM: " << ERM << endl;
     return 0;
 }

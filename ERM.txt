@@ -1,0 +1,14 @@
+Calculo de ERM
+Cantidad de conexiones: 2514
+
+k: 3
+ERM: 0.758869
+Precision: 0.792363
+
+k: 4
+ERM: 1.51774
+Precision: 0.792363
+
+k: 5
+ERM: 2.27661
+Precision: 0.792363
