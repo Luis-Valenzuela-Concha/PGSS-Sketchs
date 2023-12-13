@@ -35,5 +35,5 @@
 .vscode
 chicago2015_withdata.txt
 informe
-test.cpp
-*.txt
+tests.cpp
+tests
