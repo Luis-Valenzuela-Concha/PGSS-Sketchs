@@ -1,0 +1,20 @@
+Tiempo de consulta para intervalo de 100000 datos: 205 ms
+
+Tiempo de consulta para intervalo de 200000 datos: 407 ms
+
+Tiempo de consulta para intervalo de 300000 datos: 609 ms
+
+Tiempo de consulta para intervalo de 400000 datos: 806 ms
+
+Tiempo de consulta para intervalo de 500000 datos: 1003 ms
+
+Tiempo de consulta para intervalo de 600000 datos: 1216 ms
+
+Tiempo de consulta para intervalo de 700000 datos: 1426 ms
+
+Tiempo de consulta para intervalo de 800000 datos: 1621 ms
+
+Tiempo de consulta para intervalo de 900000 datos: 1803 ms
+
+Tiempo de consulta para intervalo de 1000000 datos: 1998 ms
+
