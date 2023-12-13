@@ -94,10 +94,10 @@ int cantidadAnomalias(vector<vector<string>> conexion){
 
 int main(){
     int time = 262144;
-    vector<vector<string>> fileNoTimeStamp = copiarArchivoSinTimestamp("datasets/chicago2015_withdata.txt",time);
-    vector<vector<string>> file = copiarArchivo("datasets/chicago2015_withdata.txt",time);
+    //vector<vector<string>> fileNoTimeStamp = copiarArchivoSinTimestamp("datasets/chicago2015_withdata.txt",time);
+    //vector<vector<string>> file = copiarArchivo("datasets/chicago2015_withdata.txt",time);
 
-    unordered_map<string, vector<vector<string>>> separated;
+    /*unordered_map<string, vector<vector<string>>> separated;
     vector<vector<vector<string>>> conexiones;
     for (const auto& vec : fileNoTimeStamp) {
         separated[vec[1]].push_back(vec);
@@ -108,9 +108,16 @@ int main(){
             conexion.push_back(vec2);
         }
         conexiones.push_back(conexion);
-    }
+    }*/
 
-    freopen("ERM2.txt","w",stdout);
+    int m = 1000; int T = time;
+    int k = 5;
+    cout << "k: " << k << endl;
+    PGSS_BDH sketch (m,T,k);
+    cout << "size sketch: " <<sketch.size_in_bytes() << endl;
+
+
+    /*freopen("test.txt","w",stdout);
     cout << "Calculo de ERM" << endl;
     cout << "Cantidad de conexiones: " << conexiones.size() << endl << endl;
     int m = 1000; int T = time;
@@ -144,7 +151,7 @@ int main(){
         double precision = suma_precision/conexiones.size();
         cout << "ERM: " << ERM << endl;
         cout << "Precision: " << precision << endl << endl;
-    }
+    }*/
 
     return 0;
 }

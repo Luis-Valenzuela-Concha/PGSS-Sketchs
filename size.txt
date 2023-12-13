@@ -1,0 +1,6 @@
+k: 2
+size sketch: 8388704000000
+k: 3
+size sketch: 12583056000000
+k: 4
+size sketch: 16777408000000

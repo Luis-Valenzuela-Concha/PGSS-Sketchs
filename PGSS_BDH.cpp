@@ -124,7 +124,7 @@ vector<pair<int,int>> PGSS_BDH:: find_anomalia(int s, int d, int ts, int te, flo
 
     //Crea subintervalos
     vector<pair<int,int>> I;
-    for(int i = 0; i < rango_total ; i++){
+    for(int i = 0; i < rango_total; i++){
         I.push_back(pair<int,int>(ts+i,ts+i));
     }
 
@@ -152,6 +152,12 @@ vector<pair<int,int>> PGSS_BDH:: find_anomalia(int s, int d, int ts, int te, flo
         }
     }
     return anomalias;
+}
+
+unsigned long int PGSS_BDH::size_in_bytes(){
+    unsigned long int size_celda = sizeof(unordered_map<int,int>) + (2*T-1)*sizeof(pair<int,int>);
+    unsigned long int size = k*m*m*size_celda;
+    return size;
 }
 
 void PGSS_BDH::print(int x,int y, int hash){

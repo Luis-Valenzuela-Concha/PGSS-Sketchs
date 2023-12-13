@@ -19,6 +19,7 @@ class PGSS_BDH{
         int query(int s, int d, int ts, int te);
         void update(int s, int d, int w, int t);
         int useHash(int n, int hash);
+        unsigned long int size_in_bytes();
         void print(int x, int y, int hash);
         vector<pair<int,int>> find_anomalia(int s, int d, int ts, int te, float precision);
 };
