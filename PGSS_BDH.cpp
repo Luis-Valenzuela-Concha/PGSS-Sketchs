@@ -155,9 +155,28 @@ vector<pair<int,int>> PGSS_BDH:: find_anomalia(int s, int d, int ts, int te, flo
 }
 
 unsigned long int PGSS_BDH::size_in_bytes(){
-    unsigned long int size_celda = sizeof(unordered_map<int,int>) + (2*T-1)*sizeof(pair<int,int>);
+    /*unsigned long int size_celda = log2(T)+1*sizeof(unordered_map<int,int>) + (2*T-1)*sizeof(pair<int,int>);
     unsigned long int size = k*m*m*size_celda;
-    return size;
+    return size;*/
+
+    unsigned long int total_size = 0;
+
+    // Añade el tamaño de 'sketch'
+    for (const auto &matrix : sketch) {
+        total_size += sizeof(matrix); // tamaño de cada vector<vector<vector<unordered_map<int,int>>>>
+        for (const auto &row : matrix) {
+            total_size += sizeof(row); // tamaño de cada vector<vector<unordered_map<int,int>>>
+            for (const auto &cell : row) {
+                total_size += sizeof(cell); // tamaño de cada vector<unordered_map<int,int>>
+                for (const auto &umap : cell) {
+                    total_size += sizeof(umap); // tamaño de cada unordered_map<int,int>
+                    total_size += umap.size() * (sizeof(int) * 2); // tamaño de los elementos en cada unordered_map
+                }
+            }
+        }
+    }
+
+    return total_size;
 }
 
 void PGSS_BDH::print(int x,int y, int hash){

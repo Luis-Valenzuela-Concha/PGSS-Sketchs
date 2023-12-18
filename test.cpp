@@ -93,7 +93,7 @@ int cantidadAnomalias(vector<vector<string>> conexion){
 }
 
 int main(){
-    int time = 262144*2*2;
+    int time = 262144*2;
     //vector<vector<string>> fileNoTimeStamp = copiarArchivoSinTimestamp("datasets/chicago2015_withdata.txt",time);
     vector<vector<string>> file = copiarArchivo("datasets/chicago2015_withdata.txt",time);
 
@@ -111,15 +111,21 @@ int main(){
     }*/
 
     int m = 1000; int T = time;
-    int k = 3;
+    int k = 5;
     PGSS_BDH sketch (m,T,k);
     int i = 1;
     for(vector<string> linea : file){
         sketch.update(stoi(linea[4]),stoi(linea[5]),stoi(linea[6]),i);
         i++;
     }
-    int rep = 10;
-    freopen("time2.txt","w",stdout);
+
+    freopen("size2.txt","w",stdout);
+    cout << "Calculo de tamaño" << endl;
+    cout << "Cantidad de conexiones: " << file.size() << endl << endl;
+    cout << "Tamaño de la estructura: " << sketch.size_in_bytes() << " bytes" << endl << endl;
+
+    /*int rep = 10;
+    freopen("size2.txt","w",stdout);
     for(int i = 100000; i < time ; i+=100000){
         auto tiempo_consulta = 0;
         for(int r = 0; r<rep; r++){
@@ -130,7 +136,7 @@ int main(){
         }
         tiempo_consulta = tiempo_consulta/rep;
         cout << "Tiempo de consulta para intervalo de " << i << " datos: " << tiempo_consulta << " ms" << endl << endl;
-    }
+    }*/
 
     /*freopen("test.txt","w",stdout);
     cout << "Calculo de ERM" << endl;

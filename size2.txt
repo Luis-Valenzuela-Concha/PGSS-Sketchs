@@ -1,0 +1,5 @@
+Calculo de tamaño
+Cantidad de conexiones: 524288
+
+Tamaño de la estructura: 5886443200 bytes
+
