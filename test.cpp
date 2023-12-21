@@ -10,33 +10,6 @@
 
 using namespace std;
 
-vector<vector<string>> copiarArchivoSinTimestamp(string nombreArchivo, int n){
-    ifstream archivo(nombreArchivo);
-    vector<vector<string>> vec;
-    string linea_archivo;
-    while (getline(archivo, linea_archivo) and n>0) {
-        vector<string> linea;
-        for(int i=0;i<4;i++){
-            linea_archivo.erase(0, linea_archivo.find(" ") + 1);
-        }
-        linea.push_back(linea_archivo.substr(0, linea_archivo.find(" "))); //IP1
-        linea_archivo.erase(0, linea_archivo.find(" ") + 1);
-        linea.push_back(linea_archivo.substr(0, linea_archivo.find(" "))); //IP 2
-        linea_archivo.erase(0, linea_archivo.find(" ") + 1);
-
-        linea_archivo.erase(0, linea_archivo.find(" ") + 1);
-        linea_archivo.erase(0, linea_archivo.find(" ") + 1);
-        linea_archivo.erase(0, linea_archivo.find(" ") + 1);
-
-        linea.push_back(linea_archivo.substr(0, linea_archivo.find(" ")));
-
-        vec.push_back(linea);
-        n--;
-    }
-    archivo.close();
-    return vec;
-}
-
 vector<vector<string>> copiarArchivo(string nombreArchivo, int n){
     ifstream archivo(nombreArchivo);
     vector<vector<string>> vec;
@@ -96,12 +69,12 @@ int main(){
     int time = 262144;
     vector<vector<string>> file = copiarArchivo("datasets/chicago2015_withdata.txt",time);
     
+    //Separa las conexiones por IP1_IP2
     unordered_map<string, vector<vector<string>>> separated;
     for(vector<string> linea : file){
         string key = linea[4] + "_" + linea[5]; // Combina la primera y la segunda IP para crear la clave
         separated[key].push_back(linea);
     }
-    freopen("recall_precision.txt","w",stdout);
     vector<vector<vector<string>>> separados;
     vector<pair<string, vector<vector<string>>>> conexiones(separated.begin(), separated.end());
     for(auto it = separated.begin(); it != separated.end(); it++){
@@ -112,6 +85,7 @@ int main(){
         separados.push_back(conexion);
     }
 
+    //Calcula las anomalias reales
     vector<vector<string>> anomalias_reales;
     for(vector<vector<string>> conexion : separados){
         vector<vector<string>> anomalias_conexion = return_anomalias(conexion);
@@ -119,10 +93,14 @@ int main(){
             anomalias_reales.push_back(linea);
         }
     }
+
+    //Almacena las anomalias reales en un set
     set<tuple<string,string,string,string>> anomalias_reales_set;
     for(vector<string> linea : anomalias_reales){
         anomalias_reales_set.insert(make_tuple(linea[0],linea[1],linea[2],linea[3]));
     }
+
+    freopen("recall_precision.txt","w",stdout);
     for(int k = 2 ; k<=5 ; k++){
         int m = 1000; int T = time;
         PGSS_BDH sketch (m,T,k);
@@ -132,6 +110,7 @@ int main(){
             sketch.update(stoi(linea[4]),stoi(linea[5]),stoi(linea[6]),i);
             i++;
         }
+        //Calcula las anomalias estimadas
         vector<vector<string>> anomalias_estimadas;
         for (vector<vector<string>> conexion : separados){
             vector<pair<int,int>> anomalias = sketch.find_anomalia(stoi(conexion[0][4]),stoi(conexion[0][5]),1,time,1);
@@ -139,14 +118,14 @@ int main(){
                 anomalias_estimadas.push_back(file[anomalia.first-1]);
             }
         }
+        //Almacena las anomalias estimadas en un set
         set<tuple<string,string,string,string>> anomalias_estimadas_set;
         for(vector<string> linea : anomalias_estimadas){
             anomalias_estimadas_set.insert(make_tuple(linea[0],linea[1],linea[2],linea[3]));
         }
 
-        int TP = 0;
-        int FP = 0;
-        int FN = 0;
+        //Calcula precision y recall
+        int TP = 0, FP = 0, FN = 0;
         for(tuple<string,string,string,string> anomalia : anomalias_estimadas_set){
             if(anomalias_reales_set.find(anomalia) != anomalias_reales_set.end()){
                 TP++;
@@ -165,13 +144,8 @@ int main(){
         cout << "Precision: " << precision << endl;
         cout << "Recall: " << recall << endl << endl;
     }
-    /*cout << endl <<"Anomalias estimadas: " << endl;
-    for(vector<string> linea : anomalias_estimadas){
-        cout << linea[0] << " " << linea[1] << " " << linea[2] << " " << linea[3] << " " << linea[4] << " " << linea[5] << " " << linea[6] << endl;
-    }*/
 
-
-
+    //Calculo de espacio del sketch
     /*freopen("size.txt","w",stdout);
     for (int k=2;k<=5;k++){
         PGSS_BDH sketch (m,T,k);
@@ -186,8 +160,9 @@ int main(){
         cout << "Tamaño de la estructura: " << sketch.size_in_bytes() << " bytes" << endl << endl;
     }*/
 
+    //Calculo de tiempo de consulta
     /*int rep = 10;
-    freopen("size2.txt","w",stdout);
+    freopen("time.txt","w",stdout);
     for(int i = 100000; i < time ; i+=100000){
         auto tiempo_consulta = 0;
         for(int r = 0; r<rep; r++){
@@ -199,42 +174,5 @@ int main(){
         tiempo_consulta = tiempo_consulta/rep;
         cout << "Tiempo de consulta para intervalo de " << i << " datos: " << tiempo_consulta << " ms" << endl << endl;
     }*/
-
-    /*freopen("test.txt","w",stdout);
-    cout << "Calculo de ERM" << endl;
-    cout << "Cantidad de conexiones: " << conexiones.size() << endl << endl;
-    int m = 1000; int T = time;
-    for(int k = 2; k <= 5 ; k++){
-        cout << "k: " << k << endl;
-        PGSS_BDH sketch (m,T,k);
-        int i = 1;
-        for(vector<string> linea : file){
-            sketch.update(stoi(linea[4]),stoi(linea[5]),stoi(linea[6]),i);
-            i++;
-        }
-  
-        double ER;
-        double suma_precision = 0;
-        for (vector<vector<string>> conexion : conexiones){ 
-            double valor_exacto = (double)cantidadAnomalias(conexion);
-            vector<pair<int,int>> anomalias = sketch.find_anomalia(stoi(conexion[0][0]),stoi(conexion[0][1]),1,time,1);
-            double valor_estimado = double(anomalias.size());
-            if(valor_exacto == 0){
-                valor_exacto += 1;
-                valor_estimado += 1;
-            }
-            if(valor_estimado == valor_exacto) {
-                suma_precision++;
-            }
-            double error = abs(valor_exacto - valor_estimado)/valor_exacto;
-            ER += error;
-        }
-
-        double ERM = ER/conexiones.size();
-        double precision = suma_precision/conexiones.size();
-        cout << "ERM: " << ERM << endl;
-        cout << "Precision: " << precision << endl << endl;
-    }*/
-
     return 0;
 }
