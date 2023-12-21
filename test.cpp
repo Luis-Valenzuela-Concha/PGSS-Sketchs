@@ -93,7 +93,7 @@ vector<vector<string>> return_anomalias(vector<vector<string>> conexion){
 }
 
 int main(){
-    int time = 262144/2/2;
+    int time = 262144;
     vector<vector<string>> file = copiarArchivo("datasets/chicago2015_withdata.txt",time);
     
     unordered_map<string, vector<vector<string>>> separated;
@@ -101,7 +101,7 @@ int main(){
         string key = linea[4] + "_" + linea[5]; // Combina la primera y la segunda IP para crear la clave
         separated[key].push_back(linea);
     }
-    //freopen("conexiones.txt","w",stdout);
+    freopen("recall_precision.txt","w",stdout);
     vector<vector<vector<string>>> separados;
     vector<pair<string, vector<vector<string>>>> conexiones(separated.begin(), separated.end());
     for(auto it = separated.begin(); it != separated.end(); it++){
@@ -119,36 +119,57 @@ int main(){
             anomalias_reales.push_back(linea);
         }
     }
-    /*cout << "Anomalias reales:" << endl;
+    set<tuple<string,string,string,string>> anomalias_reales_set;
     for(vector<string> linea : anomalias_reales){
-        cout << linea[0] << " " << linea[1] << " " << linea[2] << " " << linea[3] << " " << linea[4] << " " << linea[5] << " " << linea[6] << endl;
-    }*/
-
-
-    int m = 1000; int T = time; int k = 3;
-    PGSS_BDH sketch (m,T,k);
-
-    int i = 1;
-    for(vector<string> linea : file){
-        sketch.update(stoi(linea[4]),stoi(linea[5]),stoi(linea[6]),i);
-        i++;
+        anomalias_reales_set.insert(make_tuple(linea[0],linea[1],linea[2],linea[3]));
     }
-    vector<vector<string>> anomalias_estimadas;
-    for (vector<vector<string>> conexion : separados){
-        vector<pair<int,int>> anomalias = sketch.find_anomalia(stoi(conexion[0][4]),stoi(conexion[0][5]),1,time,1);
-        for(pair<int,int> anomalia : anomalias){
-            anomalias_estimadas.push_back(file[anomalia.first-1]);
+    for(int k = 2 ; k<=5 ; k++){
+        int m = 1000; int T = time;
+        PGSS_BDH sketch (m,T,k);
+
+        int i = 1;
+        for(vector<string> linea : file){
+            sketch.update(stoi(linea[4]),stoi(linea[5]),stoi(linea[6]),i);
+            i++;
         }
+        vector<vector<string>> anomalias_estimadas;
+        for (vector<vector<string>> conexion : separados){
+            vector<pair<int,int>> anomalias = sketch.find_anomalia(stoi(conexion[0][4]),stoi(conexion[0][5]),1,time,1);
+            for(pair<int,int> anomalia : anomalias){
+                anomalias_estimadas.push_back(file[anomalia.first-1]);
+            }
+        }
+        set<tuple<string,string,string,string>> anomalias_estimadas_set;
+        for(vector<string> linea : anomalias_estimadas){
+            anomalias_estimadas_set.insert(make_tuple(linea[0],linea[1],linea[2],linea[3]));
+        }
+
+        int TP = 0;
+        int FP = 0;
+        int FN = 0;
+        for(tuple<string,string,string,string> anomalia : anomalias_estimadas_set){
+            if(anomalias_reales_set.find(anomalia) != anomalias_reales_set.end()){
+                TP++;
+            }else{
+                FP++;
+            }
+        }
+        for(tuple<string,string,string,string> anomalia : anomalias_reales_set){
+            if(anomalias_estimadas_set.find(anomalia) == anomalias_estimadas_set.end()){
+                FN++;
+            }
+        }
+        double precision = (double)TP/(double)(TP+FP);
+        double recall = (double)TP/(double)(TP+FN);
+        cout << "Funciones hash: " << k << endl;
+        cout << "Precision: " << precision << endl;
+        cout << "Recall: " << recall << endl << endl;
     }
     /*cout << endl <<"Anomalias estimadas: " << endl;
     for(vector<string> linea : anomalias_estimadas){
         cout << linea[0] << " " << linea[1] << " " << linea[2] << " " << linea[3] << " " << linea[4] << " " << linea[5] << " " << linea[6] << endl;
     }*/
 
-    int cantidad_anomalias_reales = anomalias_reales.size();
-    int cantidad_anomalias_estimadas = anomalias_estimadas.size();
-    cout << endl << "Cantidad de anomalias reales: " << cantidad_anomalias_reales << endl;
-    cout << "Cantidad de anomalias estimadas: " << cantidad_anomalias_estimadas << endl;
 
 
     /*freopen("size.txt","w",stdout);
