@@ -41,7 +41,9 @@ vector<vector<string>> copiarArchivo(string nombreArchivo, int n){
 }
 
 int main(){
-     // Copia de archivo
+    // Prueba de funcionamiento
+
+    // Copia de archivo
     int n = 262144;
     vector<vector<string>> file = copiarArchivo("datasets/chicago2015_withdata.txt",n);
     printf("Se extraen %d datos en el intervalo:\n",n);

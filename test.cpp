@@ -66,6 +66,8 @@ vector<vector<string>> return_anomalias(vector<vector<string>> conexion){
 }
 
 int main(){
+    // Pruebas experimentales
+
     int time = 262144;
     vector<vector<string>> file = copiarArchivo("datasets/chicago2015_withdata.txt",time);
     
